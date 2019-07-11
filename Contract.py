@@ -48,6 +48,7 @@ class Contract:
     def BuildContractTX(self,nonce,functionName,*args,**kwargs):
         
         try:
+            FUNC=self.contract.get_function_by_name(functionName)
             if kwargs.gas is None
                 try:
                     gasEstimated=FUNC(*args).estimateGas()
@@ -60,13 +61,19 @@ class Contract:
             else:
                  gasEstimated=kwargs.gas
 
+            if kwargs.gasprice is None
+                gasprice=self.Web3.toWei('20', 'gwei')
+            else:
+                gasprice=kwargs.gasprice
+
             builtTX=FUNC(*args).buildTransaction({
                 'chainId':  self.chainId,
                 'gas': gasEstimated,
-                'gasPrice': self.Web3.toWei('20', 'gwei'),
+                'gasPrice': gasprice,
                 'nonce': nonce,
             })
             return builtTX
+
         except Exception as error:
             print(error)
 
@@ -85,6 +92,11 @@ class Contract:
                 print('gas estimated')
             else:
                  gasEstimated=kwargs.gas
+
+            if kwargs.gasprice is None
+                gasprice=self.Web3.toWei('20', 'gwei')
+            else:
+                gasprice=kwargs.gasprice  
                  
             builtTX=FUNC(*args).buildTransaction({
                 'chainId':  self.chainId,
@@ -123,7 +135,7 @@ class Contract:
 
         nonce= self.Web3.eth.getTransactionCount(address)
         
-        tx=self.BuildContractTX(nonce,functionName,*args)
+        tx=self.BuildContractTX(nonce,functionName,*args,**kwargs))
        
         return self.SendFunctionTransaction(private_key,tx)
 
@@ -131,6 +143,6 @@ class Contract:
 
         nonce= self.Web3.eth.getTransactionCount(address)
        
-        tx=self.BuildContractTXbySig(nonce,functionsig,*args)
+        tx=self.BuildContractTXbySig(nonce,functionsig,*args,**kwargs))
        
-        return self.SendFunctionTransaction(private_key,tx) 
+        return self.SendFunctionTransaction(private_key,tx)  
